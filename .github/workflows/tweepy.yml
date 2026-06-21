@@ -2,10 +2,10 @@ name: Post Tweet
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # 10:00 WIB
-    - cron: "0 9 * * *"   # 16:00 WIB
-    - cron: "0 13 * * *"  # 20:00 WIB
-  workflow_dispatch:       # Bisa trigger manual juga
+    - cron: "0 3 * * *"
+    - cron: "0 9 * * *"
+    - cron: "0 13 * * *"
+  workflow_dispatch:
 
 jobs:
   post-tweet:
@@ -24,10 +24,10 @@ jobs:
 
       - name: Run bot
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
         run: python bot.py
         
