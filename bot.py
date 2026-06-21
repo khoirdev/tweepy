@@ -26,7 +26,7 @@ def generate_tweet():
     theme = random.choice(themes)
     full_prompt = PROMPT + " Tema: " + theme
     response = client_ai.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.0-flash-lite",
         contents=full_prompt,
     )
     tweet = response.text.strip()
