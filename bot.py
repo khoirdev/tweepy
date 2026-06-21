@@ -1,15 +1,15 @@
 import os
 import tweepy
-from google import genai
+import requests
 import random
 
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 X_API_KEY = os.environ["X_API_KEY"]
 X_API_SECRET = os.environ["X_API_SECRET"]
 X_ACCESS_TOKEN = os.environ["X_ACCESS_TOKEN"]
 X_ACCESS_SECRET = os.environ["X_ACCESS_SECRET"]
+AI_API_KEY = os.environ["AI_API_KEY"]
 
-client_ai = genai.Client(api_key=GEMINI_API_KEY)
+AI_BASE_URL = "https://chat.khoirulaziz757.workers.dev/v1"
 
 themes = [
     "kehidupan anak kos yang chaos tapi tetap optimis",
@@ -25,11 +25,24 @@ PROMPT = "Kamu adalah akun Twitter humor Indonesia absurd dan sarkastik. Tulis 1
 def generate_tweet():
     theme = random.choice(themes)
     full_prompt = PROMPT + " Tema: " + theme
-    response = client_ai.models.generate_content(
-        model="gemini-2.0-flash-lite",
-        contents=full_prompt,
-    )
-    tweet = response.text.strip()
+
+    headers = {
+        "Authorization": "Bearer " + AI_API_KEY,
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": "@cf/meta/llama-3-8b-instruct",
+        "messages": [
+            {"role": "user", "content": full_prompt}
+        ],
+        "max_tokens": 100,
+    }
+
+    response = requests.post(AI_BASE_URL + "/chat/completions", headers=headers, json=payload)
+    response.raise_for_status()
+    data = response.json()
+    tweet = data["choices"][0]["message"]["content"].strip()
+
     if len(tweet) > 280:
         tweet = tweet[:277] + "..."
     return tweet
@@ -54,3 +67,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
