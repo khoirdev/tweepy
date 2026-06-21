@@ -31,7 +31,7 @@ def generate_tweet():
         "Content-Type": "application/json",
     }
     payload = {
-        "model": "@cf/meta/llama-3-8b-instruct",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
         "messages": [
             {"role": "user", "content": full_prompt}
         ],
