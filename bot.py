@@ -1,6 +1,6 @@
 import os
 import tweepy
-import google.generativeai as genai
+from google import genai
 import random
 
 # === CONFIG ===
@@ -11,8 +11,7 @@ X_ACCESS_TOKEN = os.environ["X_ACCESS_TOKEN"]
 X_ACCESS_SECRET = os.environ["X_ACCESS_SECRET"]
 
 # === GEMINI SETUP ===
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
+client_ai = genai.Client(api_key=GEMINI_API_KEY)
 
 # === PROMPT THEMES ===
 themes = [
@@ -34,6 +33,43 @@ Tulis 1 tweet humor dalam Bahasa Indonesia.
 Aturan:
 - Maksimal 250 karakter
 - Tidak pakai hashtag
+- Tidak pakai emoji berlebihan (max 1)
+- Tidak menjelaskan lelucon
+- Tone: absurd, sarkastik, atau deadpan
+- Hanya tulis tweet-nya saja, tanpa keterangan tambahan"""
+
+def generate_tweet():
+    theme = random.choice(themes)
+    prompt = f"{SYSTEM_PROMPT}\n\nTema hari ini: {theme}"
+    response = client_ai.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+    )
+    tweet = response.text.strip()
+    if len(tweet) > 280:
+        tweet = tweet[:277] + "..."
+    return tweet
+
+def post_tweet(text):
+    client_x = tweepy.Client(
+        consumer_key=X_API_KEY,
+        consumer_secret=X_API_SECRET,
+        access_token=X_ACCESS_TOKEN,
+        access_token_secret=X_ACCESS_SECRET,
+    )
+    response = client_x.create_tweet(text=text)
+    print(f"✅ Tweet posted! ID: {response.data['id']}")
+    print(f"📝 Content: {text}")
+    return response
+
+def main():
+    print("🤖 Generating tweet...")
+    tweet = generate_tweet()
+    print(f"📝 Generated: {tweet}")
+    post_tweet(tweet)
+
+if __name__ == "__main__":
+    main()
 - Tidak pakai emoji berlebihan (max 1)
 - Tidak menjelaskan lelucon
 - Tone: absurd, sarkastik, atau deadpan
